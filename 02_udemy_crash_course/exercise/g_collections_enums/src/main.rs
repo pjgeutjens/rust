@@ -25,13 +25,8 @@ impl Shot {
         // - return 0 points if `self` is a Miss
         match self {
             Shot::Bullseye => 5,
-            Shot::Hit(x) => {
-                if x < 3.0 {
-                    2
-                } else {
-                    1
-                }
-            }
+            Shot::Hit(x) if x < 3.0 => 2,
+            Shot::Hit(x) => 1,
             Shot::Miss => 0,
         }
     }
@@ -54,11 +49,12 @@ fn main() {
     let mut total = 0;
     for coord in arrow_coords {
         coord.print_description();
-        match coord.distance_from_center() {
-            x if x < 1.0 => shots.append(Shot::Bullseye),
-            x if x >= 1.0 && x <= 5.0 => shots.append(Shot::Hit(x)),
-            x if x > 5.0 => shots.append(Shot::Miss),
-        }
+        let shot = match coord.distance_from_center() {
+            x if x < 1.0 => Shot::Bullseye,
+            x if x >= 1.0 && x <= 5.0 => Shot::Hit(x),
+            _ => Shot::Miss,
+        };
+        shots.push(shot);
     }
 
     // 3. Finally, loop through each shot in shots and add its points to total
